@@ -1,0 +1,304 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MagSafe Wallet Pro | Capes</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+</head>
+<body>
+
+  <!-- START: Navbar -->
+  <header class="navbar">
+    <div class="logo">Capes</div>
+    <nav>
+      <ul>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#reviews">Reviews</a></li>
+        <li><a href="#cta">Buy</a></li>
+      </ul>
+    </nav>
+  </header>
+  <!-- END: Navbar -->
+
+  <!-- START: Hero Section -->
+  <section class="hero" data-aos="fade-in">
+    <div class="product-container">
+
+      <!-- START: Thumbnails -->
+      <div class="thumbnail-wrapper">
+        <div class="arrow up-arrow">&#9650;</div>
+        <div class="vertical-thumbnails">
+          <img src="image/Artboard_10_15807f9a-cf63-46d7-9d0a-20ad6d9eb246.webp" class="thumb active" alt="Thumbnail 1" onclick="changeMainImages('image/Artboard_10_15807f9a-cf63-46d7-9d0a-20ad6d9eb246.webp')">
+          <img src="image/Artboard_2_4efee976-1075-4777-86c1-8ee15c128f33 (1).webp" class="thumb" alt="Thumbnail 2" onclick="changeMainImages('image/Artboard_2_4efee976-1075-4777-86c1-8ee15c128f33 (1).webp')">
+          <img src="image/Artboard_2_4efee976-1075-4777-86c1-8ee15c128f33 (2).webp" class="thumb" alt="Thumbnail 3" onclick="changeMainImages('image/Artboard_2_4efee976-1075-4777-86c1-8ee15c128f33 (2).webp')">
+          <img src="image/Artboard_2_4efee976-1075-4777-86c1-8ee15c128f33.webp" class="thumb" alt="Thumbnail 4" onclick="changeMainImages('image/Artboard_2_4efee976-1075-4777-86c1-8ee15c128f33.webp')">
+          <img src="image/Artboard_6_63c6389c-5c19-46c0-afdf-865579834597.webp" class="thumb" alt="Thumbnail 5" onclick="changeMainImages('image/Artboard_6_63c6389c-5c19-46c0-afdf-865579834597.webp')">
+        </div>
+        <div class="arrow down-arrow">&#9660;</div>
+      </div>
+      <!-- END: Thumbnails -->
+
+      <!-- START: Main Product Image -->
+  <div class="zoom-container">
+    <div class="img-wrapper">
+      <img id="mainImg" src="./image/magsafe-wallate-carbon-fibre-black.webp" alt="Product Image">
+    </div>
+    <div class="zoom-view" id="zoomView"></div>
+  </div>
+<!-- END: Main Product Image -->
+
+      <!-- START: Product Details -->
+      <div class="product-details" data-aos="fade-up">
+        <h1 class="product-title">MagSafe Wallet Pro with Stand</h1>
+        <p class="price-highlight">Now starting at just <strong>₹1,199</strong></p>
+
+        <div class="divider"></div>
+
+        <div class="option-section">
+          <h4>Type</h4>
+          <div class="option-gallery">
+            <img src="./image/Artboard_2_4efee976-1075-4777-86c1-8ee15c128f33 (1).webp" class="small-option" alt="Stand Option">
+            <img src="./image/magsafe-wallate-pro-black-leather.avif" class="small-option" alt="Leather Option">
+          </div>
+        </div>
+
+        <div class="option-section">
+          <h4>Texture</h4>
+          <div class="texture-options">
+            <span class="texture black active" title="Black"></span>
+            <span class="texture carbon" title="Carbon"></span>
+            <span class="texture brown" title="Brown"></span>
+            <span class="texture blue" title="Blue"></span>
+          </div>
+        </div>
+
+        <div class="includes">
+          <h4>What's Included</h4>
+          <ul>
+            <li>1 × MagLock Wallet</li>
+            <li>1 × Alcohol Cleaning Swab</li>
+            <li>1 × Magnetic Ring</li>
+            <li>1 × Premium Microfibre Cloth</li>
+          </ul>
+        </div>
+
+        <div class="offers-section">
+          <h3>🎉 Current Offers</h3>
+          <p>Buy Any 2 Products → <strong>15% off</strong></p>
+          <p>Buy Any 3 Products → <strong>20% off</strong></p>
+          <p style="color: #d35400; font-weight: bold;">↓ Discount Applied Automatically On Cart ↓</p>
+        </div>
+
+        <a href="#cta" class="add-to-cart-btn">🛒 Add to Cart</a>
+      </div>
+      <!-- END: Product Details -->
+    </div>
+  </section>
+  <!-- END: Hero Section -->
+
+  <!-- START: Review Section -->
+  <section class="review-section">
+    <h2>Customer Reviews</h2>
+    <div class="overall-rating">
+      <h3>Overall Rating: 4.5/5</h3>
+      <div class="stars">★★★★½</div>
+    </div>
+
+    <form class="review-form">
+      <h4>Write a Review</h4>
+      <label for="reviewer">Name</label>
+      <input type="text" id="reviewer" placeholder="Your name" required />
+      <label for="review-stars">Your Rating</label>
+      <div class="star-input">
+        <input type="radio" name="stars" id="star5" value="5"><label for="star5">★</label>
+        <input type="radio" name="stars" id="star4" value="4"><label for="star4">★</label>
+        <input type="radio" name="stars" id="star3" value="3"><label for="star3">★</label>
+        <input type="radio" name="stars" id="star2" value="2"><label for="star2">★</label>
+        <input type="radio" name="stars" id="star1" value="1"><label for="star1">★</label>
+      </div>
+      <label for="review-text">Your Review</label>
+      <textarea id="review-text" placeholder="Share your thoughts..." required></textarea>
+      <button type="submit">Submit Review</button>
+    </form>
+
+    <div class="review">
+      <div class="review-header">
+        <strong>John D.</strong>
+        <div class="stars">★★★★☆</div>
+      </div>
+      <p class="review-text">Great product! Love the magnet grip and the stand is really handy.</p>
+    </div>
+
+    <div class="review">
+      <div class="review-header">
+        <strong>Priya S.</strong>
+        <div class="stars">★★★★★</div>
+      </div>
+      <p class="review-text">Totally worth the price. Looks premium and feels solid on my iPhone.</p>
+    </div>
+  </section>
+  <!-- END: Review Section -->
+
+  <!-- START: Video Grid Features -->
+  <section class="video-feature-grid" data-aos="fade-up">
+    <div class="grid-container">
+      <div class="grid-item">
+        <div class="video-wrapper">
+          <video autoplay loop muted>
+            <source src="videos/3692633-hd_1920_1080_30fps.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="overlay-text">Kick Back in Style</div>
+        </div>
+      </div>
+  
+      <div class="grid-item">
+        <div class="video-wrapper">
+          <video autoplay loop muted>
+            <source src="videos/853984-hd_1920_1080_25fps.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="overlay-text">Pro Grip</div>
+        </div>
+      </div>
+  
+      <div class="grid-item">
+        <div class="video-wrapper">
+          <video autoplay loop muted>
+            <source src="videos/9558563-uhd_4096_2160_25fps.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="overlay-text">Strong Magnets</div>
+        </div>
+      </div>
+  
+      <div class="grid-item">
+        <div class="video-wrapper">
+          <video autoplay loop muted>
+            <source src="videos/3692633-hd_1920_1080_30fps.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="overlay-text">Carry Essentials</div>
+        </div>
+      </div>
+  
+      <div class="grid-item">
+        <div class="video-wrapper">
+          <video autoplay loop muted>
+            <source src="videos/853984-hd_1920_1080_25fps.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="overlay-text">Android Compatible</div>
+        </div>
+      </div>
+  
+      <div class="grid-item">
+        <div class="video-wrapper">
+          <video autoplay loop muted>
+            <source src="videos/9558563-uhd_4096_2160_25fps.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+          <div class="overlay-text">Tested with 5000+ Drops</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- END: Video Grid Features -->
+
+    <!-- START: Product Pairing Section -->
+<section class="product-pairing" data-aos="zoom-in">
+  <h3 data-aos="fade-up" data-aos-delay="100">Pair with These Premium Products</h3>
+  <div class="products">
+    <div class="product-card" data-aos="fade-up" data-aos-delay="200">
+      <img src="product1.jpg" alt="Product 1" />
+      <h4>MagSafe Wallet Pro</h4>
+      <p>Keep your cards and cash secure with this sleek and magnetic wallet.</p>
+      <a href="#" class="product-btn">View Product</a>
+    </div>
+    <div class="product-card" data-aos="fade-up" data-aos-delay="400">
+      <img src="product2.jpg" alt="Product 2" />
+      <h4>Wireless Charging Stand</h4>
+      <p>Charge your devices wirelessly with this fast and reliable charging stand.</p>
+      <a href="#" class="product-btn">View Product</a>
+    </div>
+    <div class="product-card" data-aos="fade-up" data-aos-delay="600">
+      <img src="product3.jpg" alt="Product 3" />
+      <h4>Smart Bluetooth Speaker</h4>
+      <p>Experience crisp sound and deep bass with this portable speaker.</p>
+      <a href="#" class="product-btn">View Product</a>
+    </div>
+  </div>
+</section>
+<!-- END: Product Pairing Section -->
+
+<!-- START: FAQ Section -->
+<section class="faq" id="faq">
+  <h3 class="section-title">Frequently Asked Questions</h3>
+  <div class="faq-item">
+    <button class="faq-toggle">What is MagSafe Wallet Pro?</button>
+    <div class="faq-content">
+      <p>The MagSafe Wallet Pro is a sleek and magnetic wallet designed to securely hold your cards and cash while offering a minimalist design for your iPhone.</p>
+    </div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-toggle">How does wireless charging work?</button>
+    <div class="faq-content">
+      <p>Wireless charging uses electromagnetic fields to transfer energy from a charging pad to your device, eliminating the need for physical connectors.</p>
+    </div>
+  </div>
+  <div class="faq-item">
+    <button class="faq-toggle">How can I contact support?</button>
+    <div class="faq-content">
+      <p>You can contact our support team through our website's contact page, where we offer live chat and email support.</p>
+    </div>
+  </div>
+</section>
+<!-- END: FAQ Section -->
+
+<!-- START: Testimonial Section -->
+<section class="testimonials" id="testimonials">
+  <h3 class="section-title">What Our Customers Are Saying</h3>
+  <div class="testimonial-card">
+    <p>"I absolutely love the MagSafe Wallet Pro! It's sleek, practical, and holds my cards securely without adding bulk to my iPhone."</p>
+    <span>- Sarah K.</span>
+  </div>
+  <div class="testimonial-card">
+    <p>"The wireless charging stand has been a game-changer! I can charge all my devices without any hassle, and it's so stylish."</p>
+    <span>- John D.</span>
+  </div>
+  <div class="testimonial-card">
+    <p>"The Bluetooth speaker offers great sound quality and is portable. It's perfect for outdoor trips!"</p>
+    <span>- Emily R.</span>
+  </div>
+</section>
+<!-- END: Testimonial Section -->
+
+<!-- START: About Me Section with CTA -->
+<section class="about-me" id="about-me">
+  <h3 class="section-title">About Me</h3>
+  <p>I am a passionate product designer and tech enthusiast who loves creating innovative and user-friendly products. Explore more about my journey and projects!</p>
+  <a href="contact.html" class="cta-btn">Get in Touch</a>
+</section>
+<!-- END: About Me Section with CTA -->
+
+  <!-- END: Call to Action Section -->
+
+  <!-- START: Sticky Footer -->
+  <footer class="sticky-footer">
+    <div class="footer-buttons">
+      <button class="add-to-cart">🛒 Add to Cart</button>
+      <button class="buy-now">⚡ Buy Now</button>
+    </div>
+  </footer>
+  <!-- END: Sticky Footer -->
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.9.1/gsap.min.js"></script>
+
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

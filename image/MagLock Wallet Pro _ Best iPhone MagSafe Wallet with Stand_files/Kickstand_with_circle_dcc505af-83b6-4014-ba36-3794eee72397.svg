@@ -1,0 +1,24 @@
+<svg viewBox="0 0 197.92 197.92" xmlns="http://www.w3.org/2000/svg" data-sanitized-data-name="Layer 1" data-name="Layer 1" id="Layer_1">
+  <defs>
+    <style>
+      .cls-1 {
+        stroke: #231f20;
+        stroke-width: 6px;
+      }
+
+      .cls-1, .cls-2 {
+        fill: none;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-2 {
+        stroke: #fff;
+      }
+    </style>
+  </defs>
+  <circle r="98.46" cy="98.96" cx="98.96" class="cls-2"></circle>
+  <g>
+    <rect transform="translate(-27.61 65.52) rotate(-26.71)" ry="1.17" rx="1.17" height="153.36" width="24.55" y="14.22" x="111.91" class="cls-1"></rect>
+    <line y2="158.17" x2="30.27" y1="73.94" x1="101.91" class="cls-1"></line>
+  </g>
+</svg>

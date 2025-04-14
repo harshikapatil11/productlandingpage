@@ -1,0 +1,209 @@
+window.LATTICE_API="https://api.shopagain.io";
+
+
+(function () {
+
+    const currentScriptUrlObj = new URL(document.currentScript.src);
+    const currentScriptSearchParams = currentScriptUrlObj.searchParams;
+    const company_id = currentScriptSearchParams.get('company_id');
+
+    const mini_cart_class_names = [
+        'shopagain_widgets_up_sell_mini_cart',
+        'shopagain_widgets_cross_sell_mini_cart',
+        'shopagain_widgets_hot_products_mini_cart',
+        'shopagain_widgets_best_sellers_mini_cart',
+        'shopagain_widgets_recently_viewed_mini_cart',
+
+        'shopagain_widgets_up_sell_staging_mini_cart',
+        'shopagain_widgets_cross_sell_staging_mini_cart',
+        'shopagain_widgets_hot_products_staging_mini_cart',
+        'shopagain_widgets_best_sellers_staging_mini_cart',
+        'shopagain_widgets_recently_viewed_staging_mini_cart',
+
+        'shopagain_widgets_up_sell_dev_mini_cart',
+        'shopagain_widgets_cross_sell_dev_mini_cart',
+        'shopagain_widgets_hot_products_dev_mini_cart',
+        'shopagain_widgets_best_sellers_dev_mini_cart',
+        'shopagain_widgets_recently_viewed_dev_mini_cart'
+    ]
+
+    const LATTICEAI_ENV = (function () {
+        if (window.LATTICE_API.includes("api.latticeai.io") || window.LATTICE_API.includes("api.shopagain.io")) {
+            return "prod";
+        }
+        else if (window.LATTICE_API.includes("mercuryapi-staging.latticeai.io")) {
+            return "staging";
+        }
+        else {
+            return "dev";
+        }
+    })();
+
+    const localStorageKey = `shopagain-data-${LATTICEAI_ENV}`;
+    const shopagainLocalStorage = {
+        // use this to get or set items in localstorage
+        getObject: function () {
+            const objValueResp = localStorage.getItem(localStorageKey);
+            let objValue = {};
+            try {
+                objValue = JSON.parse(objValueResp);
+            }
+            catch (e) {
+                console.log(e);
+            }
+            if (typeof objValue !== "object" || objValue === null) {
+                objValue = {};
+            }
+            return objValue;
+        },
+        set: function (key, value) {
+            const objValue = this.getObject();
+            objValue[key] = value;
+            localStorage.setItem(localStorageKey, JSON.stringify(objValue));
+        },
+        del: function (key) {
+            const objValue = this.getObject();
+            delete objValue[key];
+            localStorage.setItem(localStorageKey, JSON.stringify(objValue));
+        },
+        get: function (key) {
+            const objValue = this.getObject();
+            return objValue[key];
+        },
+    };
+
+
+    const apiBase = window.LATTICE_API;
+    const currentScript = document.currentScript;
+    const src = currentScript.src
+    const scriptUrl = new URL(src)
+    const scriptSearchParams = scriptUrl.searchParams
+    const shop = scriptSearchParams.get('shop')
+    let productFetched = true
+
+    function hasMiniCart() {
+        for (let index = 0; index < mini_cart_class_names.length; index++) {
+            if (document.getElementsByClassName(mini_cart_class_names[index]).length)
+                return true;
+        }
+        return false;
+    }
+    const fetchProductsAndRender = async (render_mini_widget = false) => {
+        let cartIds = []
+
+        if ((window.location.href.includes("/cart") || hasMiniCart()) && window.Shopify && window.Shopify.routes && window.Shopify.routes.root) {
+            const settings = await (await fetch('/cart.js')).json()
+            if (settings && settings.items && settings.items.length)
+                cartIds = settings.items.map(item => item.product_id)
+        }
+
+        const url = new URL(`campaigns/get_widget_products/`, apiBase).toString();
+
+        fetch(url, {
+            method: 'POST',
+            body: JSON.stringify({
+                shop: shop,
+                page_url: window.location.href,
+                pid: shopagainLocalStorage.get('pid'),
+                uid: shopagainLocalStorage.get('uid'),
+                cart_product_ids: cartIds,
+                shopifyCurrency: window.Shopify && window.Shopify.currency || null,
+                shopifyCountry: window.Shopify && window.Shopify.country || null,
+                script_query_params: {
+                    ...Object.fromEntries(scriptSearchParams),
+                    ...window.shopagain_script_query_params || {},
+                },
+                render_mini_widget
+            }),
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        }).then(resp => resp.json()).then(data => {
+            const css = data.css;
+            const style = document.createElement("style");
+            style.innerHTML = css;
+
+            if (company_id === "c780a9ba-d8b7-4673-80b8-06089eed57b2") {
+                console.log("lemonade widget")
+                const reviewCarousel = document.getElementById("shopify-section-0c17bf6a-eec4-414d-86b0-d44b66f318d2");
+                if (reviewCarousel) {
+                    const divClassName = "shopagain_widgets_all";
+                    const div = document.createElement("div");
+                    div.setAttribute("class", divClassName);
+                    reviewCarousel.insertAdjacentElement("afterend", div);
+                }
+            }
+
+            document.head.appendChild(style);
+            data.widgets.forEach((widget) => {
+                const widgetType = widget.type;
+                const className = widget.className;
+                const html = widget.html;
+                let container = document.querySelector("." + className);
+                if (!container) {
+                    container = document.createElement("div");
+                    container.setAttribute("class", widget.className);
+                    let containerClassName = function () {
+                        if (LATTICEAI_ENV === "prod") {
+                            return "shopagain_widgets_all";
+                        }
+                        else {
+                            return `shopagain_widgets_all_${LATTICEAI_ENV}`;
+                        }
+                    }();
+                    let parentContainer = document.querySelector(`.${containerClassName}`);
+                    if (!parentContainer) {
+                        parentContainer = document.querySelector("main");
+                    }
+                    if (parentContainer) {
+                        parentContainer.append(container);
+                    }
+                    // const footer = document.querySelector("footer");
+                    // footer.parentElement.insertBefore(container, footer);
+
+                }
+                container.innerHTML = html;
+
+                container.querySelectorAll(".shopagain-product-card").forEach((button) => {
+                    button.setAttribute("data-widget-type", widgetType);
+                    button.setAttribute("data-widget-is-mini", mini_cart_class_names.includes(className));
+                    button.setAttribute("data-widget-is-loaded", "true");
+                });
+            });
+
+            const js = data.js;
+            const script = document.createElement("script");
+            script.setAttribute("data-base-url", apiBase);
+            script.setAttribute("data-localstorage-key", localStorageKey);
+            script.setAttribute("data-shop", shop);
+            script.innerHTML = js;
+            document.head.appendChild(script);
+
+        });
+    }
+    fetchProductsAndRender();
+    const observer = new PerformanceObserver((list) => {
+        if (hasMiniCart() && productFetched) {
+            let reRenderMiniCart = false;
+            for (const entry of list.getEntries()) {
+                if (entry.name.includes('/cart/'))
+                    reRenderMiniCart = true
+            }
+            if (reRenderMiniCart) {
+                productFetched = false;
+                setTimeout(() => {
+                    fetchProductsAndRender(true)
+                    productFetched = true;
+                }, 2000);
+            }
+        }
+    });
+
+    observer.observe({
+        entryTypes: ["resource"]
+    });
+
+
+})();
+!function(){try{var e="undefined"!=typeof window?window:"undefined"!=typeof global?global:"undefined"!=typeof self?self:{},n=(new Error).stack;n&&(e._sentryDebugIds=e._sentryDebugIds||{},e._sentryDebugIds[n]="95963906-2268-54cb-b0ae-59b47dd5cc2b")}catch(e){}}();
+//# debugId=95963906-2268-54cb-b0ae-59b47dd5cc2b

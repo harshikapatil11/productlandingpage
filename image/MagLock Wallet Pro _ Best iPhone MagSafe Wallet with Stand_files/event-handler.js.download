@@ -1,0 +1,254 @@
+const BIK_EMAIL_KEY = "bik-email";
+const BIK_PHONE_KEY = "bik-phone";
+const BIK_SHOPIFY_CUSTOMER_ID = "bik-shopify-customer-id";
+const BIK_CUSTOMER_PD_ID = "bik-pg-id";
+const BIK_EH_KEY = "bik-eh";
+const PIXEL_ENDPOINT =
+  "https://bikapi.bikayi.app/integrations/bikPlatformFunctions-recordFrontendEvent";
+/**
+ * Registers an event.
+ * @param {string} source - The source of the event example : 'gokwik'.
+ * @param {{ name: string, properties: object }} event - The event object with name and event properties.
+ * @param {{ email?: string, phoneNumber?: string, shopifyCustomerId?: string }} customerData - Customer Initialization data.
+ * @returns {Promise<void>}
+ */
+async function registerEventLocal(source, event, customerData) {
+  logIfDebug(
+    `start the registerEventLocal, ${source} ${JSON.stringify(
+      event
+    )} ${JSON.stringify(customerData)}`
+  );
+
+  if (source !== "gokwik") {
+    logIfDebug(`Invalid source: ${source}`);
+    return;
+  }
+  // Customer identification data
+  const customerIdentification = {
+    shopifyCustomerId: customerData?.shopifyCustomerId,
+    phoneNumber: customerData?.phoneNumber,
+    email: customerData?.email,
+  };
+
+  // If customer data is not available, record event in history
+  if (!isCustomerDataAvailable(customerIdentification)) {
+    logIfDebug("Customer data not available");
+    return;
+  }
+  // If customer data is available, record event internally
+  let shopifyEvent = event;
+
+  shopifyEvent = await transformGokwikEventToShopify(event);
+  logIfDebug(`Transformed event: ${source} ${JSON.stringify(shopifyEvent)}`);
+  // Identify customer based on initialization data
+  identifyCustomer(customerData);
+
+  // Prepare Shopify base frontend event
+  const shopifyBaseFrontendEvent = {
+    data: { ...shopifyEvent.properties },
+    id: event?.id,
+    name: shopifyEvent?.name,
+  };
+
+  await recordEventInternal({
+    shop: shopDomain,
+    source: source,
+    isLogRequest: true, // only logs the request but returns processed false
+    eventPayload: shopifyBaseFrontendEvent,
+    ...customerIdentification,
+  });
+}
+
+function transformGokwikEventToShopify(event) {
+  const shopifyEventName =
+    {
+      Started_Checkout_GK: "checkout_started",
+      Mobile_Added_GK: "checkout_contact_info_submitted",
+      Address_Complete_GK: "checkout_address_info_submitted",
+      Payment_Method_Selected_GK: "checkout_shipping_info_submitted",
+      Payment_Complete_GK: "checkout_completed",
+    }[event.name] || event.name;
+
+  const properties = {
+    productDetails: event.properties?.ProductDetails || {},
+    cartSubtotal: event.properties?.CartSubtotal || 0,
+    discountCode: event.properties?.DiscountCode || "",
+    discountAmount: event.properties?.DiscountAmount || 0,
+    totalAmount: event.properties?.TotalAmount || 0,
+    currency: event.properties?.Currency || "",
+    shippingCharges: event.properties?.ShippingCharges || 0,
+    goKwikTag: event.properties?.goKwikTag || "",
+  };
+
+  return {
+    name: shopifyEventName,
+    properties,
+  };
+}
+
+function isCustomerDataAvailable(customerIdentification) {
+  return (
+    customerIdentification &&
+    (customerIdentification.shopifyCustomerId ||
+      customerIdentification.email ||
+      customerIdentification.phoneNumber)
+  );
+}
+
+/**
+ * Identifies and stores customer data locally.
+ * @param {{ email?: string, phoneNumber?: string, shopifyCustomerId?: string }} customerData - Customer initialization data.
+ * @returns {void}
+ */
+function identifyCustomer(customerData) {
+  const cachedCustomer = {};
+  const cachedDataEmail = localStorage.getItem(BIK_EMAIL_KEY);
+  if (cachedDataEmail) {
+    cachedCustomer.email = ED.decryptData(cachedDataEmail);
+    if (cachedCustomer.email !== customerData.email) {
+      localStorage.setItem(BIK_EMAIL_KEY, ED.encryptData(customerData.email));
+    }
+  } else {
+    if (customerData && customerData.email) {
+      localStorage.setItem(BIK_EMAIL_KEY, ED.encryptData(customerData.email));
+    }
+  }
+
+  const cachedDataPhone = localStorage.getItem(BIK_PHONE_KEY);
+  if (cachedDataPhone) {
+    cachedCustomer.phoneNumber = ED.decryptData(cachedDataPhone);
+    if (cachedCustomer.phoneNumber !== customerData.phoneNumber) {
+      localStorage.setItem(
+        BIK_PHONE_KEY,
+        ED.encryptData(customerData.phoneNumber)
+      );
+    }
+  } else {
+    if (customerData && customerData.phoneNumber) {
+      localStorage.setItem(
+        BIK_PHONE_KEY,
+        ED.encryptData(customerData.phoneNumber)
+      );
+    }
+  }
+  const cachedCustomerId = localStorage.getItem(BIK_SHOPIFY_CUSTOMER_ID);
+  if (cachedCustomerId) {
+    cachedCustomer.shopifyCustomerId = ED.decryptData(cachedCustomerId);
+    if (cachedCustomer.shopifyCustomerId !== customerData.shopifyCustomerId) {
+      localStorage.setItem(
+        BIK_SHOPIFY_CUSTOMER_ID,
+        ED.encryptData(customerData.shopifyCustomerId)
+      );
+    }
+  } else {
+    if (customerData && customerData.shopifyCustomerId) {
+      localStorage.setItem(
+        BIK_SHOPIFY_CUSTOMER_ID,
+        ED.encryptData(customerData.shopifyCustomerId)
+      );
+    }
+  }
+}
+
+/* ======== Record internal events API ======== */
+
+async function recordEventInternal(request) {
+  let endpoint = PIXEL_ENDPOINT;
+
+  const response = await fetch(endpoint, {
+    method: "POST",
+    body: JSON.stringify(request),
+  });
+
+  const responseJson = await response.json();
+  // If customerId received in response and save pgId
+  if (responseJson && responseJson.data && responseJson.data.customerId) {
+    localStorage.setItem(
+      BIK_CUSTOMER_PD_ID,
+      ED.encryptData(responseJson.data.customerId)
+    );
+  }
+
+  return responseJson.data;
+}
+
+/**
+ * Encrypts and decrypts data.
+ */
+class ED {
+  static encryptData(data) {
+    const key = "phaedrus";
+    let encryptedData = "";
+    for (let i = 0; i < data.length; i++) {
+      encryptedData += String.fromCharCode(
+        data.charCodeAt(i) ^ key.charCodeAt(i % key.length)
+      );
+    }
+    return encryptedData;
+  }
+
+  static decryptData(data) {
+    return this.encryptData(data); //  decryption
+  }
+}
+/**
+ * Registers user properties.
+ * @param {string} source - The source of the user properties example : 'gokwik'.
+ * @param {any} userProperties - User properties object.
+ * @param {{ email?: string, phoneNumber?: string, shopifyCustomerId?: string }} customerData - Customer Initialization data.
+ * @returns {Promise<void>}
+ */
+async function registerUserPropertiesLocal(
+  source,
+  userProperties,
+  customerData
+) {
+  logIfDebug(
+    `Entering registerUserPropertiesLocal : source = ${source}, userProperties = ${JSON.stringify(
+      userProperties
+    )}, customerData = ${JSON.stringify(customerData)}`
+  );
+}
+
+/**
+ * Logs the message if debug is enabled.
+ * @param {string} message - The message to be logged.
+ * @returns {void}
+ */
+function logIfDebug(message) {
+  const debugEnabled = localStorage.getItem("bik-debug");
+  if (debugEnabled && debugEnabled.toLowerCase() === "true") {
+    console.log("bik-logs", message);
+  }
+}
+
+/* ==== Main Section for exposing registerEvents and registerUserProperties to external usage ==== */
+
+const BIK = {
+  /**
+   * Registers an event.
+   * @param {string} source - The source of the event example : 'gokwik'.
+   * @param {{ name: string, properties: object }} event - The event object with name and event properties.
+   * @param {{ email?: string, phoneNumber?: string, shopifyCustomerId?: string }} customerData - Customer Initialization data.
+   * @returns {Promise<void>}
+   */
+  async registerEvent(source, event, customerData) {
+    await registerEventLocal(source, event, customerData);
+  },
+
+  /**
+   * Registers user properties.
+   * @param {string} source - The source of the user properties example : 'gokwik'.
+   * @param {any} userProperties - User properties object.
+   * @param {{ email?: string, phoneNumber?: string, shopifyCustomerId?: string }} customerData - Customer Initialization data.
+   * @returns {Promise<void>}
+   */
+  async registerUserProperties(source, userProperties, customerData) {
+    await registerUserPropertiesLocal(source, userProperties, customerData);
+  },
+};
+
+// Expose BIK object globally if running in browser context
+if (typeof window !== "undefined") {
+  window.BIK = BIK;
+}
